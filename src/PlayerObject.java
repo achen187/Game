@@ -2,49 +2,31 @@
 
 import java.awt.geom.Point2D;
 
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.Loader;
+
+import GameEngine.Game.GameDrawer;
+import GameEngine.Game.ResourceLoader;
 import GameEngine.GameObject;
 
-class PlayerObject extends GameObject
+class PlayerObject extends MovingObject
+
 {
-    float direction;
-    
-    Point2D.Float oldPosition;
-    
-	//==================================================================================================
-    public PlayerObject (float x, float y)
-    {
-        super (x, y);
-        oldPosition = getPosition();
-    }
-    
-    //==================================================================================================
-    
-    public void setDirection(float direction)
-    {
-        while (direction < 0.0) direction += 360.0;
-        while (direction >= 360.0) direction -= 360.0;
-        
-        this.direction = direction;
-        
-        // Set the rotation to be the same as the direction value
-        rotation = direction;
-    }
-    
-    public void revertPosition ()
-    {
-    	this.setPosition(oldPosition);
-    }
-    
-    public float getDirection()
-    {
-		return direction;
+
+	public PlayerObject(float arg0, float arg1, ResourceLoader loader) {
+		super(arg0, arg1);
+        addTexture(loader.loadTexture("Textures/spaceship_sm.gif"), 16, 16);
+
 	}
 
-
-	public void moveInDirection(float direction)
-	{
-		oldPosition = this.getPosition();
-		incrementPosition((float)Math.sin(Math.toRadians(direction))*2, -(float)Math.cos(Math.toRadians(direction))*2);
-		setDirection(direction);
+	@Override
+	public float[] getColor() {
+		return new float[]{0f, 1.0f, 0f, 1.0f};
 	}
+
+	@Override
+	public void draw(GameDrawer drawer) {
+		drawer.draw(this, getColor(), 1.0f);
+		
+	}
+  
 }

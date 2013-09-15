@@ -23,10 +23,14 @@ public class SurvivalGame extends Game
     private boolean alive = true;
     
     // A Collection of GameObjects in the world that will be used with the collision detection system
-    private Vector<GameObject> objects = new Vector<GameObject>();
+    public static Vector<GameObject> objects = new Vector<GameObject>();
     
-    // Grid GameObjects
+    // Grid GameObjects, only used to draw floor
     private GameObject [] [] gridTile;
+    
+    private int numRows = 24;
+    private int numCols = 24;
+    
     
     // The cooldown of the gun (set this to 0 for a cool effect :> )
     private int cooldown = 10;
@@ -53,6 +57,11 @@ public class SurvivalGame extends Game
     
     // Variable to keep track of the background / world size
     private Point2D.Float worldSize;
+    
+    
+    public static int heightTile;
+    public static int widthTile;
+
     
     // Name your audio cues here and set the paths the files are located!!
     // Make sure the enum and paths match!
@@ -91,6 +100,8 @@ public class SurvivalGame extends Game
     public SurvivalGame (int GFPS)
     {
         super(GFPS);
+        
+        
     }
 
     //==================================================================================================
@@ -112,32 +123,33 @@ public class SurvivalGame extends Game
         // Loading up our textures
         GameTexture softRockTexture = loader.loadTexture("Textures/asteroid.png");
         GameTexture rockTexture = loader.loadTexture("Textures/soft_rock.png");
-        GameTexture grassTexture = loader.loadTexture("Textures/grass_tile.jpg");
         bulletTexture = loader.loadTexture("Textures/bullet.png");
         
-        
-        // Setup the world grid system
-        int gridSize = 16;
+     // Setup the world grid system
+        GameTexture floorTexture = loader.loadTexture("Textures/floor_steel.jpg");
+
+        int numTiles = 6;
         // Set the world size! This is to prevent the camera going over the edge of the background
         // For tiles, use the above. If using a single image, just read the textures size!!
-        worldSize = new Point2D.Float(gridSize * grassTexture.getWidth(), gridSize * grassTexture.getHeight());
+        worldSize = new Point2D.Float(numTiles * floorTexture.getWidth(), numTiles * floorTexture.getHeight());
+        heightTile = (int) (worldSize.y / numRows);
+        widthTile = (int) (worldSize.x/ numCols);
         
         
         // Creating some random rocks to shoot
-        for (int i = 0 ; i < 8 ; i++)
+        for (int i = 0 ; i <8 ; i++)
         {
-        	float x = (float) ((Math.random()*(gridSize-4)+2)*grassTexture.getWidth());
-      		float y = (float) ((Math.random()*(gridSize-4)+2)*grassTexture.getHeight());
+        	float x = (float) (Math.random()*worldSize.x);
+      		float y = (float) (Math.random() *worldSize.y);
           
-			GameObject go = new GameObject(x, y);
-			go.addSpriteSheet(softRockTexture, 64, 64);
-			go.setSpriteSheetCol((int)(Math.random()*8));
-			go.setSpriteSheetRow((int)(Math.random()*8));
-			go.setupAnimation(true, true);
+			GenericGuard go = new GenericGuard(x, y, loader);
+			
+			float direction =((int) (Math.random()*4))*90;
+			go.setDirection(direction);
 			objects.add(go);
         }
         
-        // Add the special item
+        /*// Add the special item
         GameTexture gtSpec = loader.loadTexture("Textures/Special.png");
         GameObject goSpec = new GameObject(300, 500);
         goSpec.addTexture(gtSpec);
@@ -160,32 +172,32 @@ public class SurvivalGame extends Game
         goSpec4.reflectY(true);
         goSpec4.setRotation(180.0f);
         objects.add(goSpec4);
-        
+        */
         
         // creating the floor objects
-        gridTile = new GameObject[gridSize][gridSize];
-        for (int i = 0 ; i < gridSize ; i++)
+        gridTile = new GameObject[numTiles][numTiles];
+        for (int i = 0 ; i < numTiles ; i++)
         {
-        	for (int j = 0 ; j < gridSize ; j++)
+        	for (int j = 0 ; j < numTiles ; j++)
         	{
-        		gridTile[i][j] = new GameObject(grassTexture.getWidth() * i, grassTexture.getHeight() * j);
-        		gridTile[i][j].addTexture(grassTexture, 0, 0);
+        		gridTile[i][j] = new GameObject(floorTexture.getWidth() * i, floorTexture.getHeight() * j);
+        		gridTile[i][j].addTexture(floorTexture, 0, 0);
             }
         }
         
         
-        // Creating wall objects
-        for (int i = 0 ; i < grassTexture.getWidth()*gridSize ; i += rockTexture.getWidth())
+        /*// Creating wall objects
+        for (int i = 0 ; i < floorTexture.getWidth()*gridSize ; i += rockTexture.getWidth())
         {
     		WallObject go = new WallObject(i, 0);
     		go.addTexture(rockTexture, 0, 0);
     		objects.add(go);
     		
-    		go = new WallObject(i, grassTexture.getHeight()*(gridSize-1));
+    		go = new WallObject(i, floorTexture.getHeight()*(gridSize-1));
     		go.addTexture(rockTexture, 0, 0);
     		objects.add(go);
         }
-        for (int i = grassTexture.getHeight() ; i < grassTexture.getHeight()*(gridSize-1) ; i += rockTexture.getHeight())
+        for (int i = floorTexture.getHeight() ; i < floorTexture.getHeight()*(gridSize-1) ; i += rockTexture.getHeight())
         {
     		WallObject go = new WallObject(0, i);
     		go.addTexture(rockTexture, 0, 0);
@@ -194,21 +206,20 @@ public class SurvivalGame extends Game
     		go = new WallObject(rockTexture.getWidth()*(gridSize-1), i);
     		go.addTexture(rockTexture, 0, 0);
     		objects.add(go);
-        }
+        }*/
         
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         
         // Creating the player's ship
         player = new PlayerObject(
-                             (float)(grassTexture.getWidth()*gridSize)/2f,
-                             (float)(grassTexture.getHeight()*gridSize)/2f);
-        
-        player.addTexture(loader.loadTexture("Textures/spaceship_sm.gif"), 16, 16);
+                             (float)(worldSize.x)/2f,
+                             (float)(worldSize.y)/2f, loader);
         
         objects.add(player);
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     }
+
 
     //==================================================================================================
     
@@ -217,7 +228,7 @@ public class SurvivalGame extends Game
     {
         cooldownTimer = cooldown;
         
-        float dir = 90+player.getDegreesTo(mousePos);
+        float dir = player.direction;
         BulletObject bullet =
                 new BulletObject(
                          player.getPosition().x + (float)Math.sin(Math.toRadians(dir))*32, player.getPosition().y - (float)Math.cos(Math.toRadians(dir))*32, 1f, 300, bulletTexture);
@@ -260,35 +271,32 @@ public class SurvivalGame extends Game
         if(gii.keyDown(KeyEvent.VK_W))
         {
         	move = true;
-            if(gii.keyDown(KeyEvent.VK_A) && !gii.keyDown(KeyEvent.VK_D))
-            	directionToMove = 225;
-            else if(gii.keyDown(KeyEvent.VK_D) && !gii.keyDown(KeyEvent.VK_A))
-            	directionToMove = 135;
-            else
-            	directionToMove = 180;
+        	directionToMove = 180;
+
         }
         else if(gii.keyDown(KeyEvent.VK_S))
         {
         	move = true;
-            if(gii.keyDown(KeyEvent.VK_A) && !gii.keyDown(KeyEvent.VK_D))
-            	directionToMove = -45;
-            else if(gii.keyDown(KeyEvent.VK_D) && !gii.keyDown(KeyEvent.VK_A))
-            	directionToMove = 45;
-            else
-            	directionToMove = 0;
+            
+        	directionToMove = 0;
+
         }
         else if(gii.keyDown(KeyEvent.VK_A) && !gii.keyDown(KeyEvent.VK_D))
         {
         	move = true;
         	directionToMove = 270;
+        	
+
         }
         else if(gii.keyDown(KeyEvent.VK_D) && !gii.keyDown(KeyEvent.VK_A))
         {
         	move = true;
         	directionToMove = 90;
+        	
+
         }
         if (move)
-        	player.moveInDirection(directionToMove);
+        	player.moveInDirection(directionToMove,2 );
         
         if (cooldownTimer <= 0)
         {
@@ -314,8 +322,8 @@ public class SurvivalGame extends Game
         if (alive)
         {
             handleControls(gii);
-            player.setDirection(90+player.getDegreesTo(mousePos));
-        }
+            //player.setDirection(90+player.getDegreesTo(mousePos));
+        
         
         // NOTE: you must call doTimeStep for ALL game objects once per frame!
         // updateing step for each object
@@ -338,7 +346,7 @@ public class SurvivalGame extends Game
         if (offset.y < -worldSize.y + this.getViewportDimension().height)
         	offset.y = -worldSize.y + this.getViewportDimension().height;
 
-        
+        }
     //**************************        
     // COLLISION DETECTION CODE!
     //**************************
@@ -375,7 +383,18 @@ public class SurvivalGame extends Game
                 				o2.setMarkedForDestruction(true);
                 		}
                 	}
-                	else if (o1 instanceof PlayerObject || o2 instanceof PlayerObject)
+                	else if (o1 instanceof PlayerObject && o2 instanceof Enemy || o1 instanceof Enemy && o2 instanceof PlayerObject)
+                	{
+                		if (fineTuneCollision(o1,o2))
+                		{
+                			if (o1 instanceof PlayerObject)
+                				o1.setMarkedForDestruction(true);
+                			else
+                				o2.setMarkedForDestruction(true);
+                			
+                		}
+                	}
+                	else if (o1 instanceof PlayerObject && o2 instanceof PlayerObject)
                 	{
                 		if (fineTuneCollision(o1,o2))
                 		{
@@ -421,6 +440,8 @@ public class SurvivalGame extends Game
     }
 
     
+	
+
 	public static boolean fineTuneCollision(GameObject o1, GameObject o2) {
 
 		ByteBuffer bb1 = o1.getCurrentTexture().getByteBuffer();
@@ -493,35 +514,40 @@ public class SurvivalGame extends Game
         // Drawing all the objects in the game
         for (GameObject o: objects)
         {
-        	drawer.draw(o, 1.0f, 1.0f, 1.0f, 1.0f, 0);
+        	
+        	((MyGameObject)o).draw(drawer);
+        	
         }
         
 
         // this is just a random line drawn in the corner of the screen
-        drawer.draw(GameDrawer.LINES, linePositions, lineColours, 0.5f);
+       // drawer.draw(GameDrawer.LINES, linePositions, lineColours, 0.5f);
         
-        if (player != null)
-        {
-        	Point2D.Float [] playerLines = {mousePos, player.getPosition()};
-        	drawer.draw(GameDrawer.LINES, playerLines, lineColours, 0.5f);
-        }
+//        if (player != null)
+//        {
+//        	Point2D.Float [] playerLines = {mousePos, player.getPosition()};
+//        	drawer.draw(GameDrawer.LINES, playerLines, lineColours, 0.5f);
+//        }
         
         drawer.setColour(1.0f,1.0f,1.0f,1.0f);
         
         // Changing the offset to 0 so that drawn objects won't move with the camera
         drawer.setWorldOffset(0, 0);
         
+        if (alive == false)
+        	drawer.draw(arial, "Game Over", new Point2D.Float(worldSize.x/4, worldSize.y/2), new float[]{1.0f, 0f, 0f, 1.0f}, 1.0f, 2.0f);
+
         // this is just a random line drawn in the corner of the screen (but not offset this time ;) )
-        drawer.draw(GameDrawer.LINES, linePositions, lineColours, 0.5f);
+        //drawer.draw(GameDrawer.LINES, linePositions, lineColours, 0.5f);
         
         
         // Some debug type info to demonstrate the font drawing
-        if (player != null)
+        /*if (player != null)
         {
         	drawer.draw(arial, ""+player.getDirection(), new Point2D.Float(20,120), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
-        }
-        drawer.draw(arial, ""+mouseWheelTick, new Point2D.Float(20,68), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
-        drawer.draw(serif, ""+mousePos.x +":"+mousePos.y, new Point2D.Float(20,20), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
+        }*/
+        //drawer.draw(arial, ""+mouseWheelTick, new Point2D.Float(20,68), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
+        //drawer.draw(serif, ""+mousePos.x +":"+mousePos.y, new Point2D.Float(20,20), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
     }
 }
 

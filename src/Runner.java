@@ -1,5 +1,7 @@
 
 
+import java.awt.Dimension;
+
 import GameEngine.GameCanvas;
 import javax.swing.*;
 
@@ -13,8 +15,10 @@ public class Runner {
         GameCanvas glc = new GameCanvas(ag);
         frame.add(glc);
         
-        frame.setResizable(false);
-        frame.setSize(800, 600);
+        frame.setResizable(true);
+        frame.setMinimumSize(new Dimension(770, 800));
+
+        frame.setSize(770, 800);
         frame.setVisible(true);
         
         // need this so that you don't have to click on the window to gain focus ;)
