@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<classpath> 
+	<classpathentry kind="src" path="src"/> 
+	<classpathentry kind="lib" path="jar/2DGame_2.0.jar"/> 
+	<classpathentry kind="lib" path="libs/gluegen-rt.jar"> 
+		<attributes> 
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SurvivalGame/libs"/> 
+		</attributes> 
+	</classpathentry> 
+	<classpathentry kind="lib" path="libs/gluegen-rt-natives-linux-amd64.jar"> 
+		<attributes> 
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SurvivalGame/libs"/> 
+		</attributes> 
+	</classpathentry> 
+	<classpathentry kind="lib" path="libs/jogl-all.jar"> 
+		<attributes> 
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SurvivalGame/libs"/> 
+		</attributes> 
+	</classpathentry> 
+	<classpathentry kind="lib" path="libs/jogl-all-natives-linux-amd64.jar"> 
+		<attributes> 
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SurvivalGame/libs"/> 
+		</attributes> 
+	</classpathentry> 
+	<classpathentry kind="lib" path="libs/joal.jar"> 
+		<attributes> 
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SurvivalGame/libs"/> 
+		</attributes> 
+	</classpathentry> 
+	<classpathentry kind="lib" path="libs/joal-natives-linux-amd64.jar"> 
+		<attributes> 
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SurvivalGame/libs"/> 
+		</attributes> 
+	</classpathentry> 
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/> 
+	<classpathentry kind="output" path="bin"/> 
+</classpath>
