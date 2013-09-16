@@ -17,7 +17,7 @@ public class GenericGuard extends Enemy {
 	@Override
 	public void patrol() {
 		System.out.println(getDirection());
-		moveInDirection(getDirection(), 1);
+		moveInDirection(getDirection(), .5f);
 	}
 	
 
@@ -33,7 +33,37 @@ public class GenericGuard extends Enemy {
 
 	@Override
 	public void chase() {
-		
+		int dx = SurvivalGame.lastSeenGridX - getGridX();
+		int dy = SurvivalGame.lastSeenGridY - getGridY();
+		if (Math.abs(dx) == 0 && Math.abs(dy) == 0)
+		{
+			patrol();
+			return;
+		}
+		if (Math.abs(dx) > Math.abs(dy))
+		{
+			if (dx > 0)
+			{
+				moveInDirection(90f, 1.5f);
+			}
+			else
+			{
+				moveInDirection(270f, 1.5f);
+			}
+		}
+		else
+		{
+			if (dy > 0)
+			{
+				moveInDirection(180f, 1.5f);
+
+			}
+			else
+			{
+				moveInDirection(0f, 1.5f);
+
+			}
+		}
 	}
 
 	

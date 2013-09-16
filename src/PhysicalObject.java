@@ -1,5 +1,6 @@
 
 
+import GameEngine.Game.GameDrawer;
 import GameEngine.GameObject;
 import java.awt.geom.*;
 
@@ -9,7 +10,7 @@ import java.awt.geom.*;
  * @author Richard Baxter
  *
  */
-public class PhysicalObject extends GameObject {
+public class PhysicalObject extends MyGameObject {
 
     protected Point2D.Float velocity = new Point2D.Float(0, 0); // in units per frame
     protected float mass; // in ...uhm ... thingies... whatever all the physic-y equations make it ...
@@ -119,4 +120,11 @@ public class PhysicalObject extends GameObject {
         
         super.doTimeStep();
     }
+
+
+	@Override
+	public void draw(GameDrawer drawer) {
+		drawer.draw(this, 1.0f,1.0f,1.0f,1.0f, 1.0f);
+		
+	}
 }

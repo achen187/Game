@@ -70,6 +70,8 @@ public class SurvivalGame extends Game
     private int CHASE_TIME = 10;
     
     private Timer chaseTimer;
+    
+    //private static boolean ableToAttack = true;
     // Name your audio cues here and set the paths the files are located!!
     // Make sure the enum and paths match!
  	enum AudioFiles
@@ -110,6 +112,11 @@ public class SurvivalGame extends Game
         
         
     }
+    
+//    public static void setAbleToAttack(boolean fire)
+//    {
+//    	ableToAttack = fire;
+//    }
 
     //==================================================================================================
     
@@ -233,7 +240,7 @@ public class SurvivalGame extends Game
     // this method is used to fire a bullet 
     public void fireBullet()
     {
-        cooldownTimer = cooldown;
+//        cooldownTimer = cooldown;
         
         float dir = player.direction;
         BulletObject bullet =
@@ -305,14 +312,26 @@ public class SurvivalGame extends Game
         if (move)
         	player.moveInDirection(directionToMove,2 );
         
-        if (cooldownTimer <= 0)
+        
+        
+        /*if (cooldownTimer <= 0)
         {
             if(gii.keyDown(KeyEvent.VK_SPACE) || gii.mouseButtonDown(MouseEvent.BUTTON1))
             {
                 fireBullet();
             }
+        }*/
+        
+
+
+
+
+        if(gii.keyDown(KeyEvent.VK_SPACE) )
+        {
+        	player.attack();
+
         }
-        cooldownTimer --;
+        
     }
 
     //==================================================================================================
@@ -470,13 +489,18 @@ public class SurvivalGame extends Game
     	if (chaseTimer != null)
 			chaseTimer.cancel();
 		secondsRemaining = CHASE_TIME;
+		
 		chaseTimer = new Timer();
 		chaseTimer.scheduleAtFixedRate(new TimerTask(){
 			public void run()
 			{
 				SurvivalGame.secondsRemaining -= 2;	
 				if (SurvivalGame.secondsRemaining <= 0)
+				{
 					chaseTimer.cancel();
+				
+				}
+				
 			}
 		}, 2000, 2000);
     }

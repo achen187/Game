@@ -6,6 +6,8 @@ public abstract class Enemy extends MovingObject {
 
 	protected SpotLight spotLight;
 	
+	
+	
 	public Enemy(float arg0, float arg1) {
 		super(arg0, arg1);
 	}
@@ -47,7 +49,7 @@ public abstract class Enemy extends MovingObject {
 	}
 	
 	@Override
-	public void moveInDirection(float direction, int speed)
+	public void moveInDirection(float direction, float speed)
 	{
 		super.moveInDirection(direction,speed);
 		spotLight.setPosition(getSpotlightX(), getSpotlightY());
@@ -61,10 +63,17 @@ public abstract class Enemy extends MovingObject {
 	public void doTimeStep()
 	{
 		if (SurvivalGame.secondsRemaining > 0)
+		{
 			chase();
-		else
+		}else
+		{
 			patrol();
+		}
 	}
+	
+	
+	
+	
 
 	
 }
