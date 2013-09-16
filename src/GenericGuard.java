@@ -15,7 +15,7 @@ public class GenericGuard extends Enemy {
 	}
 
 	@Override
-	public void move() {
+	public void patrol() {
 		System.out.println(getDirection());
 		moveInDirection(getDirection(), 1);
 	}
@@ -29,6 +29,11 @@ public class GenericGuard extends Enemy {
 	@Override
 	public float offSetFlashlight() {
 		return 32;
+	}
+
+	@Override
+	public void chase() {
+		
 	}
 
 	

@@ -1,6 +1,8 @@
 
 
 import java.nio.ByteBuffer;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.awt.geom.*;
 import java.awt.event.*;
@@ -58,11 +60,16 @@ public class SurvivalGame extends Game
     // Variable to keep track of the background / world size
     private Point2D.Float worldSize;
     
+    public static int secondsRemaining;
+    public static int lastSeenGridX;
+    public static int lastSeenGridY;
     
     public static int heightTile;
     public static int widthTile;
 
+    private int CHASE_TIME = 10;
     
+    private Timer chaseTimer;
     // Name your audio cues here and set the paths the files are located!!
     // Make sure the enum and paths match!
  	enum AudioFiles
@@ -394,6 +401,24 @@ public class SurvivalGame extends Game
                 			
                 		}
                 	}
+                	else if (o1 instanceof PlayerObject && o2 instanceof SpotLight || o1 instanceof SpotLight && o2 instanceof PlayerObject)
+                	{
+                		if (fineTuneCollision(o1,o2))
+                		{
+                			if (o1 instanceof PlayerObject)
+                			{
+                				lastSeenGridX = ((PlayerObject) o1).getGridX();
+                				lastSeenGridY = ((PlayerObject) o1).getGridY();
+                			}
+                			else
+                			{
+                				lastSeenGridX = ((PlayerObject) o2).getGridX();
+                				lastSeenGridY = ((PlayerObject) o2).getGridY();
+                			}
+                			startChase();
+                			
+                		}
+                	}
                 	else if (o1 instanceof PlayerObject && o2 instanceof PlayerObject)
                 	{
                 		if (fineTuneCollision(o1,o2))
@@ -406,11 +431,11 @@ public class SurvivalGame extends Game
                 		System.out.println("Removing objects "+i +":"+j);
                 		if (fineTuneCollision(o1,o2))
                 		{
-                			o1.setMarkedForDestruction(true);
-                			o2.setMarkedForDestruction(true);
+                			//o1.setMarkedForDestruction(true);
+                			//o2.setMarkedForDestruction(true);
 
                 			// Play the explosion sound as something blew up (EXAMPLE)
-                			gameAudio.PlayAudioIndex(AudioFiles.Explosion.index);
+                			//gameAudio.PlayAudioIndex(AudioFiles.Explosion.index);
                 		}
                 		
                 		// Note: you can also implement something like o1.reduceHealth(5); if you don't want the object to be immediatly destroyed
@@ -430,7 +455,6 @@ public class SurvivalGame extends Game
             	if (objects.elementAt(i) == player)
             	{
                     alive = false;
-                    player = null;
                 }
                 // removing object from list of GameObjects
                 objects.remove(i);
@@ -440,7 +464,22 @@ public class SurvivalGame extends Game
     }
 
     
-	
+
+    public void startChase()
+    {
+    	if (chaseTimer != null)
+			chaseTimer.cancel();
+		secondsRemaining = CHASE_TIME;
+		chaseTimer = new Timer();
+		chaseTimer.scheduleAtFixedRate(new TimerTask(){
+			public void run()
+			{
+				SurvivalGame.secondsRemaining -= 2;	
+				if (SurvivalGame.secondsRemaining <= 0)
+					chaseTimer.cancel();
+			}
+		}, 2000, 2000);
+    }
 
 	public static boolean fineTuneCollision(GameObject o1, GameObject o2) {
 
@@ -539,7 +578,10 @@ public class SurvivalGame extends Game
 
         // this is just a random line drawn in the corner of the screen (but not offset this time ;) )
         //drawer.draw(GameDrawer.LINES, linePositions, lineColours, 0.5f);
-        
+        drawer.draw(arial, ""+secondsRemaining+ " "+lastSeenGridX + " " + lastSeenGridY, new Point2D.Float(20,68), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
+        drawer.draw(arial, ""+player.getGridX() + " " + player.getGridY(), new Point2D.Float(20,20), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
+
+
         
         // Some debug type info to demonstrate the font drawing
         /*if (player != null)

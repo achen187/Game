@@ -53,12 +53,17 @@ public abstract class Enemy extends MovingObject {
 		spotLight.setPosition(getSpotlightX(), getSpotlightY());
 	}
 	
-	public abstract void move();
+	public abstract void chase();
+	public abstract void patrol();
+
 	
 	@Override
 	public void doTimeStep()
 	{
-		move();
+		if (SurvivalGame.secondsRemaining > 0)
+			chase();
+		else
+			patrol();
 	}
 
 	
