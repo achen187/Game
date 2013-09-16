@@ -92,6 +92,11 @@ class PlayerObject extends MovingObject
 	public void attacking(boolean b) {
 		attacking = b;
 	}
+
+	public boolean isAttacking() {
+		// TODO Auto-generated method stub
+		return attacking;
+	}
 	
   
 }

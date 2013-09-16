@@ -11,5 +11,9 @@ public abstract class MyGameObject extends GameObject {
 	
 	public abstract void draw(GameDrawer drawer);
 	
+	public boolean isBehind(MyGameObject other)
+	{
+		return true;
+	}
 
 }

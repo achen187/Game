@@ -8,7 +8,7 @@ import GameEngine.Game.ResourceLoader;
 public class Knife extends Weapon {
 	
 
-	private int distanceKnife = 35;
+	private int distanceKnife = 40;
 
 	public Knife(float arg0, float arg1, ResourceLoader loader, String path,
 			PlayerObject playerObject) {

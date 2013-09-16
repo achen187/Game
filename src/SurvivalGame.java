@@ -438,6 +438,31 @@ public class SurvivalGame extends Game
                 			
                 		}
                 	}
+                	else if (o1 instanceof Enemy && o2 instanceof Knife || o1 instanceof Knife && o2 instanceof Enemy)
+                	{
+                		if (player.isAttacking() == true)
+                		{
+                			if (fineTuneCollision(o1,o2))
+                			{
+                				if (o1 instanceof Enemy)
+                				{
+                					if (((Knife) o2).isBehind((Enemy)o1))
+                					{
+                						o1.setMarkedForDestruction(true);
+                						((Enemy) o1).getSpotLight().setMarkedForDestruction(true);
+                					}
+                				}
+                				else
+                				{
+                					if (((Knife) o1).isBehind((Enemy)o2))
+                					{
+                						o2.setMarkedForDestruction(true);
+                						((Enemy) o2).getSpotLight().setMarkedForDestruction(true);
+                					}
+                				}
+                			}
+                		}
+                	}
                 	else if (o1 instanceof PlayerObject && o2 instanceof PlayerObject)
                 	{
                 		if (fineTuneCollision(o1,o2))
