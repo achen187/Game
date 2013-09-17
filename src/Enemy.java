@@ -8,8 +8,8 @@ public abstract class Enemy extends MovingObject {
 	
 	
 	
-	public Enemy(float arg0, float arg1) {
-		super(arg0, arg1);
+	public Enemy(float arg0, float arg1, SurvivalGame game) {
+		super(arg0, arg1, game);
 	}
 	
 	public SpotLight getSpotLight()
@@ -58,6 +58,8 @@ public abstract class Enemy extends MovingObject {
 	public abstract void chase();
 	public abstract void patrol();
 
+	public abstract float patrolSpeed();
+	public abstract float chaseSpeeed();
 	
 	@Override
 	public void doTimeStep()
@@ -69,6 +71,13 @@ public abstract class Enemy extends MovingObject {
 		{
 			patrol();
 		}
+	}
+	
+	@Override
+	public void setMarkedForDestruction(boolean b)
+	{
+		super.setMarkedForDestruction(b);
+		spotLight.setMarkedForDestruction(b);
 	}
 	
 	

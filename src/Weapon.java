@@ -1,3 +1,6 @@
+import java.util.Timer;
+import java.util.TimerTask;
+
 import GameEngine.Game.GameDrawer;
 import GameEngine.Game.ResourceLoader;
 
@@ -7,14 +10,28 @@ public abstract class Weapon extends MyGameObject {
 	PlayerObject mPlayerObject;
 	
 	
-	public Weapon(float arg0, float arg1, ResourceLoader loader, String path,
+	public Weapon(float arg0, float arg1, SurvivalGame game, ResourceLoader loader,
 			PlayerObject playerObject) {
-		super (arg0, arg1);
+		super (arg0, arg1, game);
 		mPlayerObject = playerObject;
 
 		// TODO Auto-generated constructor stub
 	}
 
-	public abstract void attack();
+	public void attack()
+	{
+		mPlayerObject.attacking(true);
+		new Timer().schedule(new TimerTask(){
+			public void run()
+			{
+				finishAttacking();
+			}
+		}, 80);
+		
+	}
+	public void finishAttacking()
+	{
+		mPlayerObject.attacking(false);
+	}
 
 }

@@ -13,6 +13,13 @@ import GameEngine.GameTexture;
 import GameEngine.GameFont;
 import GameEngine.GameObject;
 
+///to do
+//make sure that the player is behind on kill
+//make enemies continue on path evenw hen they reaach the point
+//set up random map
+//different weapons
+//different enemies
+//boost
 
 //==================================================================================================
 //==================================================================================================
@@ -70,6 +77,11 @@ public class SurvivalGame extends Game
     private int CHASE_TIME = 10;
     
     private Timer chaseTimer;
+    
+    private Timer timeLeft;
+    
+    private int secondsLeft = 10;
+    private boolean gameWon = false;
     
     //private static boolean ableToAttack = true;
     // Name your audio cues here and set the paths the files are located!!
@@ -156,7 +168,19 @@ public class SurvivalGame extends Game
         	float x = (float) (Math.random()*worldSize.x);
       		float y = (float) (Math.random() *worldSize.y);
           
-			GenericGuard go = new GenericGuard(x, y, loader);
+			GenericGuard go = new GenericGuard(x, y, this, loader);
+			
+			float direction =((int) (Math.random()*4))*90;
+			go.setDirection(direction);
+			objects.add(go);
+        }
+        
+        for (int i = 0 ; i <8 ; i++)
+        {
+        	float x = (float) (Math.random()*worldSize.x);
+      		float y = (float) (Math.random() *worldSize.y);
+          
+			TallGuard go = new TallGuard(x, y, this, loader);
 			
 			float direction =((int) (Math.random()*4))*90;
 			go.setDirection(direction);
@@ -227,10 +251,25 @@ public class SurvivalGame extends Game
         // Creating the player's ship
         player = new PlayerObject(
                              (float)(worldSize.x)/2f,
-                             (float)(worldSize.y)/2f, loader);
+                             (float)(worldSize.y)/2f, this, loader);
         
         objects.add(player);
-
+        
+        objects.add(new EndPoint(300, 300, this, loader, "Textures/flashlight.png"));
+        
+        timeLeft = new Timer();
+        timeLeft.scheduleAtFixedRate(new TimerTask(){
+        	public void run()
+        	{
+        		secondsLeft -= 1;
+        		if (secondsLeft <= 0)
+        		{
+        			alive = false;
+        			timeLeft.cancel();
+        		}
+        	}
+        }
+        , 1000, 1000);
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     }
 
@@ -238,7 +277,7 @@ public class SurvivalGame extends Game
     //==================================================================================================
     
     // this method is used to fire a bullet 
-    public void fireBullet()
+    /*public void fireBullet()
     {
 //        cooldownTimer = cooldown;
         
@@ -254,7 +293,7 @@ public class SurvivalGame extends Game
         
         // Play the laser sound
         gameAudio.PlayAudioIndex(AudioFiles.Laser.index);
-    }
+    }*/
     
     public static boolean isPointInBox(final Point2D.Float point, final Rectangle2D.Float box)
     {
@@ -312,17 +351,10 @@ public class SurvivalGame extends Game
         if (move)
         	player.moveInDirection(directionToMove,2 );
         
-        
-        
-        /*if (cooldownTimer <= 0)
-        {
-            if(gii.keyDown(KeyEvent.VK_SPACE) || gii.mouseButtonDown(MouseEvent.BUTTON1))
-            {
-                fireBullet();
-            }
-        }*/
-        
-
+        if (gii.keyDown(KeyEvent.VK_1))
+        	player.changeWeapon(1);
+        if (gii.keyDown(KeyEvent.VK_2))
+        	player.changeWeapon(2);
 
 
 
@@ -424,17 +456,7 @@ public class SurvivalGame extends Game
                 	{
                 		if (fineTuneCollision(o1,o2))
                 		{
-                			if (o1 instanceof PlayerObject)
-                			{
-                				lastSeenGridX = ((PlayerObject) o1).getGridX();
-                				lastSeenGridY = ((PlayerObject) o1).getGridY();
-                			}
-                			else
-                			{
-                				lastSeenGridX = ((PlayerObject) o2).getGridX();
-                				lastSeenGridY = ((PlayerObject) o2).getGridY();
-                			}
-                			startChase();
+                			alert(player);
                 			
                 		}
                 	}
@@ -449,7 +471,6 @@ public class SurvivalGame extends Game
                 					if (((Knife) o2).isBehind((Enemy)o1))
                 					{
                 						o1.setMarkedForDestruction(true);
-                						((Enemy) o1).getSpotLight().setMarkedForDestruction(true);
                 					}
                 				}
                 				else
@@ -457,10 +478,25 @@ public class SurvivalGame extends Game
                 					if (((Knife) o1).isBehind((Enemy)o2))
                 					{
                 						o2.setMarkedForDestruction(true);
-                						((Enemy) o2).getSpotLight().setMarkedForDestruction(true);
                 					}
                 				}
                 			}
+                		}
+                	}
+                	else if (o1 instanceof Enemy && o2 instanceof BulletObject || o1 instanceof BulletObject && o2 instanceof Enemy)
+                	{
+                		if (fineTuneCollision(o1,o2))
+                		{
+                			o1.setMarkedForDestruction(true);
+                			o2.setMarkedForDestruction(true);
+                		}
+                	}
+                	
+                	else if (o1 instanceof PlayerObject && o2 instanceof EndPoint || o2 instanceof PlayerObject && o1 instanceof EndPoint)
+                	{
+                		if (fineTuneCollision(o1,o2))
+                		{
+                			gameWon = true;
                 		}
                 	}
                 	else if (o1 instanceof PlayerObject && o2 instanceof PlayerObject)
@@ -470,17 +506,18 @@ public class SurvivalGame extends Game
                 			player.revertPosition();
                 		}
                 	}
+                	
                 	else
                 	{
-                		System.out.println("Removing objects "+i +":"+j);
-                		if (fineTuneCollision(o1,o2))
-                		{
-                			//o1.setMarkedForDestruction(true);
-                			//o2.setMarkedForDestruction(true);
-
-                			// Play the explosion sound as something blew up (EXAMPLE)
-                			//gameAudio.PlayAudioIndex(AudioFiles.Explosion.index);
-                		}
+                		//System.out.println("Removing objects "+i +":"+j);
+//                		if (fineTuneCollision(o1,o2))
+//                		{
+//                			o1.setMarkedForDestruction(true);
+//                			o2.setMarkedForDestruction(true);
+//
+//                			// Play the explosion sound as something blew up (EXAMPLE)
+//                			//gameAudio.PlayAudioIndex(AudioFiles.Explosion.index);
+//                		}
                 		
                 		// Note: you can also implement something like o1.reduceHealth(5); if you don't want the object to be immediatly destroyed
                 	}
@@ -622,13 +659,21 @@ public class SurvivalGame extends Game
         // Changing the offset to 0 so that drawn objects won't move with the camera
         drawer.setWorldOffset(0, 0);
         
-        if (alive == false)
-        	drawer.draw(arial, "Game Over", new Point2D.Float(worldSize.x/4, worldSize.y/2), new float[]{1.0f, 0f, 0f, 1.0f}, 1.0f, 2.0f);
+        if (alive == false && gameWon == false)
+        	{
+        		drawer.draw(arial, "Game Over", new Point2D.Float(worldSize.x/4, worldSize.y/2), new float[]{1.0f, 0f, 0f, 1.0f}, 1.0f, 2.0f);
+        	}
+        if (gameWon == true)
+        {
+    		drawer.draw(arial, "Game Won", new Point2D.Float(worldSize.x/4, worldSize.y/2), new float[]{1.0f, 0f, 0f, 1.0f}, 1.0f, 2.0f);
+    		alive = false;
+        }
 
         // this is just a random line drawn in the corner of the screen (but not offset this time ;) )
         //drawer.draw(GameDrawer.LINES, linePositions, lineColours, 0.5f);
         drawer.draw(arial, ""+secondsRemaining+ " "+lastSeenGridX + " " + lastSeenGridY, new Point2D.Float(20,68), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
         drawer.draw(arial, ""+player.getGridX() + " " + player.getGridY(), new Point2D.Float(20,20), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
+        drawer.draw(arial, ""+ secondsLeft, new Point2D.Float(20,120), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
 
 
         
@@ -640,6 +685,13 @@ public class SurvivalGame extends Game
         //drawer.draw(arial, ""+mouseWheelTick, new Point2D.Float(20,68), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
         //drawer.draw(serif, ""+mousePos.x +":"+mousePos.y, new Point2D.Float(20,20), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
     }
+
+	public void alert(PlayerObject player) {
+		lastSeenGridX = player.getGridX();
+        lastSeenGridY = player.getGridY();
+        
+        startChase();
+	}
 }
 
 

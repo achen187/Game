@@ -9,11 +9,12 @@ public class Knife extends Weapon {
 	
 
 	private int distanceKnife = 40;
+	private int prevOffset;
 
-	public Knife(float arg0, float arg1, ResourceLoader loader, String path,
+	public Knife(float arg0, float arg1,SurvivalGame game, ResourceLoader loader,
 			PlayerObject playerObject) {
-		super(arg0, arg1, loader, path, playerObject);
-        addTexture(loader.loadTexture(path), 3, 10);
+		super(arg0, arg1, game, loader, playerObject);
+        addTexture(loader.loadTexture("Textures/Gun01.gif"), 3, 10);
 	}
 
 	@Override
@@ -24,21 +25,18 @@ public class Knife extends Weapon {
 
 	@Override
 	public void attack() {
-
-		final int prevOffset = mPlayerObject.getOffset();
+		super.attack();
+		prevOffset = mPlayerObject.getOffset();
 		mPlayerObject.setOffset(distanceKnife);
 		mPlayerObject.setWeapon();
-		mPlayerObject.attacking(true);
-		new Timer().schedule(new TimerTask(){
-			public void run()
-			{
-				mPlayerObject.setOffset(prevOffset);
-				mPlayerObject.setWeapon();
-				mPlayerObject.attacking(false);
 				
-			}
-		}, 80);
 		
 	}
-
+	@Override
+	public void finishAttacking()
+	{
+		super.finishAttacking();
+		mPlayerObject.setOffset(prevOffset);
+		mPlayerObject.setWeapon();
+	}
 }

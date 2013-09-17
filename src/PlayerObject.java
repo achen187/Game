@@ -14,12 +14,16 @@ class PlayerObject extends MovingObject
 	private Weapon curWeapon;
 	private int offsetWeapon = 10;
 	private boolean attacking = false;
+	private int curWeaponNumber = 1;
+	private Knife knife;
+	private Gun gun;
 	
-
-	public PlayerObject(float arg0, float arg1, ResourceLoader loader) {
-		super(arg0, arg1);
+	public PlayerObject(float arg0, float arg1, SurvivalGame game, ResourceLoader loader) {
+		super(arg0, arg1, game);
         addTexture(loader.loadTexture("Textures/spaceship_sm.gif"), 16, 16);
-        curWeapon = new Knife(arg0, arg1, loader, "Textures/Gun01.gif", this);
+        knife = new Knife(arg0, arg1, game, loader, this);
+        gun = new Gun(arg0, arg1, game, loader,this);
+        curWeapon = knife;
         SurvivalGame.objects.add(curWeapon);
         curWeapon.setPosition(getWeaponX(), getWeaponY());
 		curWeapon.setRotation(getDirection());
@@ -31,6 +35,30 @@ class PlayerObject extends MovingObject
 		return new float[]{0f, 1.0f, 0f, 1.0f};
 	}
 
+	public void changeWeapon(int weapon)
+	{
+		if (weapon == 1 && curWeaponNumber != 1)
+		{
+			SurvivalGame.objects.remove(curWeapon);
+	        curWeapon = knife;
+	        curWeapon.setPosition(getWeaponX(), getWeaponY());
+			curWeapon.setRotation(getDirection());
+			SurvivalGame.objects.add(curWeapon);
+			curWeaponNumber = weapon;
+
+		}
+		else if (weapon == 2 && curWeaponNumber != 2)
+		{
+			SurvivalGame.objects.remove(curWeapon);
+	        curWeapon = gun;
+	        curWeapon.setPosition(getWeaponX(), getWeaponY());
+			curWeapon.setRotation(getDirection());
+			SurvivalGame.objects.add(curWeapon);
+			curWeaponNumber = weapon;
+
+		}
+	}
+	
 	@Override
 	public void draw(GameDrawer drawer) {
 		drawer.draw(this, getColor(), 1.0f);

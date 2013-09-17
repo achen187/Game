@@ -10,8 +10,8 @@ public abstract class MovingObject extends MyGameObject {
     
     Point2D.Float oldPosition;
 	
-	public MovingObject(float arg0, float arg1) {
-		super(arg0, arg1);
+	public MovingObject(float arg0, float arg1, SurvivalGame game) {
+		super(arg0, arg1, game);
         oldPosition = getPosition();
 	}
 	   

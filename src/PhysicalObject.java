@@ -24,8 +24,8 @@ public class PhysicalObject extends MyGameObject {
      * @param y Position along the y coordinate
      * @param m The mass of this object
      */
-    public PhysicalObject(float x, float y, float m){
-        super(x,y);
+    public PhysicalObject(float x, float y, float m, SurvivalGame game){
+        super(x,y, game);
         mass = m;
     }
     
