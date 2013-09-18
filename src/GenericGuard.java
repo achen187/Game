@@ -17,7 +17,6 @@ public class GenericGuard extends Enemy {
 
 	@Override
 	public void patrol() {
-		System.out.println(getDirection());
 		moveInDirection(getDirection(), patrolSpeed);
 	}
 	

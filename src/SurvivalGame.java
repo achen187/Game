@@ -37,13 +37,14 @@ public class SurvivalGame extends Game
     // Grid GameObjects, only used to draw floor
     private GameObject [] [] gridTile;
     
-    private int numRows = 24;
-    private int numCols = 24;
+    public static int numRows = 24;
+    public static int numCols = 24;
+    private Tile[][] mazeTile;
     
     
     // The cooldown of the gun (set this to 0 for a cool effect :> )
-    private int cooldown = 10;
-    private int cooldownTimer = 0;
+    //private int cooldown = 10;
+    //private int cooldownTimer = 0;
     
     // Important GameObjects
     private PlayerObject player; // the player
@@ -160,6 +161,9 @@ public class SurvivalGame extends Game
         worldSize = new Point2D.Float(numTiles * floorTexture.getWidth(), numTiles * floorTexture.getHeight());
         heightTile = (int) (worldSize.y / numRows);
         widthTile = (int) (worldSize.x/ numCols);
+        
+        mazeTile = new Tile[numRows][numCols];
+        MazeGenerator.generateMaze(mazeTile);
         
         
         // Creating some random rocks to shoot

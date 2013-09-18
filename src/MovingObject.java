@@ -52,7 +52,6 @@ public abstract class MovingObject extends MyGameObject {
 	{
 		oldPosition = this.getPosition();
 		incrementPosition((float)Math.sin(Math.toRadians(direction))*speed, -(float)Math.cos(Math.toRadians(direction))*speed);
-		System.out.println(getPosition());
 		setDirection(direction);
 	}
 	
