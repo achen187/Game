@@ -51,6 +51,7 @@ public class SurvivalGame extends Game
     
     //Textures that will be used
     private GameTexture bulletTexture;
+    public GameTexture wallTexture;
     
     //GameFonts that will be used
     private GameFont arial, serif;
@@ -81,7 +82,7 @@ public class SurvivalGame extends Game
     
     private Timer timeLeft;
     
-    private int secondsLeft = 10;
+    private int secondsLeft = 1000;
     private boolean gameWon = false;
     
     //private static boolean ableToAttack = true;
@@ -151,7 +152,7 @@ public class SurvivalGame extends Game
         GameTexture softRockTexture = loader.loadTexture("Textures/asteroid.png");
         GameTexture rockTexture = loader.loadTexture("Textures/soft_rock.png");
         bulletTexture = loader.loadTexture("Textures/bullet.png");
-        
+        wallTexture = loader.loadTexture("Textures/wall.png" );
      // Setup the world grid system
         GameTexture floorTexture = loader.loadTexture("Textures/floor_steel.jpg");
 
@@ -163,8 +164,8 @@ public class SurvivalGame extends Game
         widthTile = (int) (worldSize.x/ numCols);
         
         mazeTile = new Tile[numRows][numCols];
-        MazeGenerator.generateMaze(mazeTile);
-        
+        MazeGenerator.generateMaze(mazeTile, this);
+        displayMaze(mazeTile);
         
         // Creating some random rocks to shoot
         for (int i = 0 ; i <8 ; i++)
@@ -299,7 +300,38 @@ public class SurvivalGame extends Game
         gameAudio.PlayAudioIndex(AudioFiles.Laser.index);
     }*/
     
-    public static boolean isPointInBox(final Point2D.Float point, final Rectangle2D.Float box)
+    
+    
+    private void displayMaze(Tile[][] mazeTile) {
+    	
+    	
+    	
+
+    	
+		for (int i = 0; i < numRows; i++)
+		{
+			for (int j = 0; j < numCols; j++)
+			{
+				Tile curTile = mazeTile[i][j];
+				if (j == 0)
+					objects.add(curTile.westWall());
+				if (i == 0)
+					objects.add(curTile.southWall());
+				if (j == numCols -1)
+					objects.add(curTile.eastWall());
+				if (i == numRows-1)
+					objects.add(curTile.northWall());
+				
+				if (curTile.hasWall(0))
+					objects.add(curTile.northWall());
+				
+				if(curTile.hasWall(1))
+					objects.add(curTile.eastWall());
+			}
+		}
+	}
+
+	public static boolean isPointInBox(final Point2D.Float point, final Rectangle2D.Float box)
     {
         return box.contains(point.x, point.y);
     }

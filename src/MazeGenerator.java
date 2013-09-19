@@ -15,10 +15,10 @@ public class MazeGenerator {
 			}
 		}	}
 	
-	public static void generateMaze(Tile[][] grid)
+	public static void generateMaze(Tile[][] grid, SurvivalGame game)
 	{
 		ArrayList <Tile> unvisited = new ArrayList<Tile>();
-		initMaze(grid, unvisited);
+		initMaze(grid, unvisited, game);
 
 		Stack<Tile> tileStack = new Stack<Tile>();
 		
@@ -59,22 +59,8 @@ public class MazeGenerator {
 			}
 			
 		}
-				
 		
-		
-	/*    Make the initial cell the current cell and mark it as visited
-	    While there are unvisited cells
-	        If the current cell has any neighbours which have not been visited
-	            Choose randomly one of the unvisited neighbours
-	            Push the current cell to the stack
-	            Remove the wall between the current cell and the chosen cell
-	            Make the chosen cell the current cell and mark it as visited
-	        Else if stack is not empty
-	            Pop a cell from the stack
-	            Make it the current cell
-	        Else
-	            Pick a random cell, make it the current cell and mark it as visited
-*/
+
 	}
 	
 	private static ArrayList<Tile> unvisitedNeighbors(Tile tile, Tile[][] grid)
@@ -99,13 +85,13 @@ public class MazeGenerator {
 		return unvisited;
 	}
 	
-	private static void initMaze(Tile[][] grid, ArrayList<Tile> unvisited)
+	private static void initMaze(Tile[][] grid, ArrayList<Tile> unvisited, SurvivalGame game)
 	{
 		for (int i = 0; i < SurvivalGame.numRows; i++)
 		{
 			for (int j = 0; j < SurvivalGame.numCols; j++)
 			{
-				grid[i][j] = new Tile(i,j);
+				grid[i][j] = new Tile(i,j, game);
 				unvisited.add(grid[i][j]);
 			}
 		}
