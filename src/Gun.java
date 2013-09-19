@@ -28,7 +28,7 @@ public class Gun extends Weapon {
         float dir = mPlayerObject.direction;
         BulletObject bullet =
                 new BulletObject(
-                         mPlayerObject.getPosition().x + (float)Math.sin(Math.toRadians(dir))*32, mPlayerObject.getPosition().y - (float)Math.cos(Math.toRadians(dir))*32, 1f, game, 300, bulletTexture);
+                         mPlayerObject.getPosition().x , mPlayerObject.getPosition().y , 1f, game, 300, bulletTexture);
         
         bullet.applyForceInDirection(dir, 6f);
         

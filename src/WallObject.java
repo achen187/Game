@@ -7,9 +7,14 @@ public class WallObject extends MyGameObject {
 
     public WallObject(float x, float y, SurvivalGame game, int degree){
     	super(x,y, game);
-    	addTexture(game.wallTexture, 16, 2);
-    	setRotation(degree);
-    	setCollidable(false);
+    	if (degree == 90 || degree == 270)
+    	{
+    		addTexture(game.verticalWallTexture, 2, 16);
+    	}
+    	else
+    	{
+    		addTexture(game.wallTexture, 16, 2);
+    	}
     }
 
 	@Override

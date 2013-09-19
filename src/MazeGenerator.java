@@ -59,7 +59,20 @@ public class MazeGenerator {
 			}
 			
 		}
-		
+				
+		for (int i = 0; i < 200; i ++)
+		{
+			
+			int randomWallDestroyX = (int) (Math.random() * SurvivalGame.numCols);
+			int randomWallDestroyY = (int) (Math.random() * SurvivalGame.numRows);
+			if (randomWallDestroyX == 0 || randomWallDestroyY == 0 || randomWallDestroyX == SurvivalGame.numCols || randomWallDestroyY == SurvivalGame.numRows)
+				continue;
+			int randomDirectionX = (int) (Math.random()*2) - 1;
+			int randomDirectionY = (int) (Math.random() * 2)-1;
+			grid[randomWallDestroyY][randomWallDestroyX].destroyWall
+			(grid[randomWallDestroyY + randomDirectionY][randomWallDestroyX + randomDirectionX]);
+		}
+	
 
 	}
 	

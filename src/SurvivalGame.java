@@ -1,6 +1,7 @@
 
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -52,6 +53,8 @@ public class SurvivalGame extends Game
     //Textures that will be used
     private GameTexture bulletTexture;
     public GameTexture wallTexture;
+    public GameTexture verticalWallTexture;
+
     
     //GameFonts that will be used
     private GameFont arial, serif;
@@ -85,6 +88,7 @@ public class SurvivalGame extends Game
     private int secondsLeft = 1000;
     private boolean gameWon = false;
     
+    private ArrayList<WallObject> walls = new ArrayList<WallObject> ();
     //private static boolean ableToAttack = true;
     // Name your audio cues here and set the paths the files are located!!
     // Make sure the enum and paths match!
@@ -153,6 +157,8 @@ public class SurvivalGame extends Game
         GameTexture rockTexture = loader.loadTexture("Textures/soft_rock.png");
         bulletTexture = loader.loadTexture("Textures/bullet.png");
         wallTexture = loader.loadTexture("Textures/wall.png" );
+        verticalWallTexture = loader.loadTexture("Textures/wallvertical.png" );
+
      // Setup the world grid system
         GameTexture floorTexture = loader.loadTexture("Textures/floor_steel.jpg");
 
@@ -312,21 +318,21 @@ public class SurvivalGame extends Game
 		{
 			for (int j = 0; j < numCols; j++)
 			{
-				Tile curTile = mazeTile[i][j];
+			Tile curTile = mazeTile[i][j];
 				if (j == 0)
-					objects.add(curTile.westWall());
+					walls.add(curTile.westWall());
 				if (i == 0)
-					objects.add(curTile.southWall());
+					walls.add(curTile.southWall());
 				if (j == numCols -1)
-					objects.add(curTile.eastWall());
+					walls.add(curTile.eastWall());
 				if (i == numRows-1)
-					objects.add(curTile.northWall());
+					walls.add(curTile.northWall());
 				
 				if (curTile.hasWall(0))
-					objects.add(curTile.northWall());
+					walls.add(curTile.northWall());
 				
 				if(curTile.hasWall(1))
-					objects.add(curTile.eastWall());
+					walls.add(curTile.eastWall());
 			}
 		}
 	}
@@ -453,6 +459,16 @@ public class SurvivalGame extends Game
         	if (!o1.getCollidable())
         		continue;
         	
+        	if (o1 instanceof BulletObject)
+        	{
+        		if (wallCollision((BulletObject) o1))
+        		{
+        			o1.setMarkedForDestruction(true);
+        			System.out.println(o1.getPosition());
+        			continue;
+        		}
+        	}
+        	
             for (int j = i+1 ; j < objects.size() ; j++)
             {
             	GameObject o2 = objects.elementAt(j);
@@ -466,17 +482,17 @@ public class SurvivalGame extends Game
                 	{
                 		// Skip wall vs wall objects
                 	}
-                	else if ((o1 instanceof BulletObject && o2 instanceof WallObject) || o1 instanceof WallObject && o2 instanceof BulletObject)
-                	{
-                		if (fineTuneCollision(o1,o2))
-                		{
-                			// Just destroy the bullet, not the wall
-                			if (o1 instanceof BulletObject)
-                				o1.setMarkedForDestruction(true);
-                			else
-                				o2.setMarkedForDestruction(true);
-                		}
-                	}
+//                	else if ((o1 instanceof BulletObject && o2 instanceof WallObject) || o1 instanceof WallObject && o2 instanceof BulletObject)
+//                	{
+//                		if (fineTuneCollision(o1,o2))
+//                		{
+//                			// Just destroy the bullet, not the wall
+//                			if (o1 instanceof BulletObject)
+//                				o1.setMarkedForDestruction(true);
+//                			else
+//                				o2.setMarkedForDestruction(true);
+//                		}
+//                	}
                 	else if (o1 instanceof PlayerObject && o2 instanceof Enemy || o1 instanceof Enemy && o2 instanceof PlayerObject)
                 	{
                 		if (fineTuneCollision(o1,o2))
@@ -582,7 +598,19 @@ public class SurvivalGame extends Game
 
     
 
-    public void startChase()
+    private boolean wallCollision(BulletObject bullet) {
+    	for (WallObject w : walls)
+    	{
+    		if (boxIntersectBox(bullet.getAABoundingBox(), w.getAABoundingBox()))
+    		{
+    			if (fineTuneCollision(bullet, w))
+    				return true;
+    		}
+    	}
+    	return false;
+    }
+
+	public void startChase()
     {
     	if (chaseTimer != null)
 			chaseTimer.cancel();
@@ -670,6 +698,11 @@ public class SurvivalGame extends Game
         	{
         		drawer.draw(gridTile[i][j], -1);
         	}
+        }
+        
+        for (WallObject w : walls)
+        {
+        	w.draw(drawer);
         }
         
         // Drawing all the objects in the game
