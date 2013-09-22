@@ -35,6 +35,7 @@ class PlayerObject extends MovingObject
 		return new float[]{0f, 1.0f, 0f, 1.0f};
 	}
 
+	//changes the weapon
 	public void changeWeapon(int weapon)
 	{
 		if (weapon == 1 && curWeaponNumber != 1)
@@ -112,6 +113,7 @@ class PlayerObject extends MovingObject
 		offsetWeapon = offset;
 	}
 
+	//repositions weapon
 	public void setWeapon() {
 		curWeapon.setPosition(getWeaponX(), getWeaponY());
 		curWeapon.setRotation(getDirection());		

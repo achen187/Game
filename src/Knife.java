@@ -4,7 +4,7 @@ import java.util.TimerTask;
 import GameEngine.Game.GameDrawer;
 import GameEngine.Game.ResourceLoader;
 
-
+//backstabbing knife
 public class Knife extends Weapon {
 	
 
@@ -23,6 +23,7 @@ public class Knife extends Weapon {
 
 	}
 
+	//changes position of knife
 	@Override
 	public void attack() {
 		super.attack();
@@ -32,6 +33,7 @@ public class Knife extends Weapon {
 				
 		
 	}
+	//put knife back in right spot
 	@Override
 	public void finishAttacking()
 	{

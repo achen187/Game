@@ -2,6 +2,7 @@
 
 import GameEngine.GameTexture;
 
+//bullet object representing a bullet
 public class BulletObject extends PhysicalObject {
     private int destroyTimer = 0;
     

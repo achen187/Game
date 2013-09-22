@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Stack;
 
-
+//helper class to generate a maze
 public class MazeGenerator {
 
 	
@@ -15,6 +15,7 @@ public class MazeGenerator {
 			}
 		}	}
 	
+	//meat of algorithm to generate maze
 	public static void generateMaze(Tile[][] grid, SurvivalGame game)
 	{
 		ArrayList <Tile> unvisited = new ArrayList<Tile>();
@@ -27,10 +28,11 @@ public class MazeGenerator {
 		curTile.setVisited(true);
 		unvisited.remove(curTile);
 
+		//while there are unvisited tiles
 		while (unvisited.size() > 0)
 		{
-			System.out.println(curTile);
 			ArrayList<Tile> unvisitedNeighbors = unvisitedNeighbors(curTile, grid);
+			//if there are unvisited neighbors
 			if (unvisitedNeighbors.isEmpty() == false)
 			{
 				int next = (int) (Math.random() * unvisitedNeighbors.size());
@@ -43,7 +45,7 @@ public class MazeGenerator {
 				curTile.setVisited(true);
 				unvisited.remove(curTile);
 				
-			}
+			}//if there's tiles in the stack
 			else if (tileStack.empty() == false)
 			{
 				System.out.println("STACK");
@@ -59,7 +61,8 @@ public class MazeGenerator {
 			}
 			
 		}
-				
+			
+		//randomly remove 200 walls, making maze easier
 		for (int i = 0; i < 200; i ++)
 		{
 			
@@ -93,6 +96,7 @@ public class MazeGenerator {
 
 	}
 	
+	//helper returning a list of tiles representing the neighbors of given tile
 	private static ArrayList<Tile> unvisitedNeighbors(Tile tile, Tile[][] grid)
 	{
 		ArrayList<Tile> unvisited = new ArrayList<Tile>();

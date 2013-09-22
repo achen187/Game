@@ -21,10 +21,9 @@ public class Gun extends Weapon {
 		fireBullet();
 	}
 
+	//fires the bullet
     public void fireBullet()
-    {
-//        cooldownTimer = cooldown;
-        
+    {        
         float dir = mPlayerObject.direction;
         BulletObject bullet =
                 new BulletObject(

@@ -1,9 +1,11 @@
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Float;
 
-
+//tile represents a box in the maze grid
 public class Tile {
 
+	//0 is north, 1 is east, 2 is south, 3 is west
+	//0 means no wall, 1 means has a wall
 	private int [] walls;
 	private int row;
 	private int column;
@@ -40,6 +42,7 @@ public class Tile {
 		return false;
 	}
 	
+	//returns the x and y values at the center of this tile
 	public int getMidX()
 	{
 		return column * SurvivalGame.widthTile + SurvivalGame.widthTile/2;
@@ -51,6 +54,7 @@ public class Tile {
 
 	}
 	
+	//destroys the wall between the two tiles
 	public void destroyWall(Tile other)
 	{
 		if (Math.abs(row - other.row)> 1 || Math.abs(column - other.column) > 1)
@@ -93,6 +97,7 @@ public class Tile {
 		return "row: " + row + " column: " + column + " north " + walls[0] + " east " + walls[1] + " south " + walls[2] + " west " + walls[3] + " visited " + visited; 
 	}
 	
+	//returns wallObjects for each wall
 	public WallObject northWall()
 	{
 		int x = column * SurvivalGame.widthTile + SurvivalGame.widthTile/2;

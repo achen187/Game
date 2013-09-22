@@ -1,7 +1,7 @@
 import GameEngine.Game.GameDrawer;
 import GameEngine.GameObject;
 
-
+//my game object
 public abstract class MyGameObject extends GameObject {
 
 	protected SurvivalGame game;
@@ -12,9 +12,6 @@ public abstract class MyGameObject extends GameObject {
 	
 	public abstract void draw(GameDrawer drawer);
 	
-	public boolean isBehind(MyGameObject other)
-	{
-		return true;
-	}
+	
 
 }

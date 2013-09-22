@@ -1,9 +1,10 @@
 import GameEngine.GameObject;
 import GameEngine.Game.GameDrawer;
 
-
+//super class of all enemies
 public abstract class Enemy extends MovingObject {
 
+	//the spotlight of the enemy
 	protected SpotLight spotLight;
 	
 	
@@ -19,6 +20,7 @@ public abstract class Enemy extends MovingObject {
 	
 	public abstract float offSetFlashlight();
 	
+	//sets where the spotlight goes relative to the enemy
 	private float getSpotlightX()
 	{
 		if (getDirection() == 180 || getDirection() == 0)
@@ -27,8 +29,6 @@ public abstract class Enemy extends MovingObject {
 			return getPosition().x + offSetFlashlight();
 		else
 			return getPosition().x - offSetFlashlight();
-			
-			
 	}
 	
 	private float getSpotlightY()
@@ -48,6 +48,7 @@ public abstract class Enemy extends MovingObject {
 		drawer.draw(this, getColor(), 1.0f);
 	}
 	
+	//sets the spotlight as well as itself
 	@Override
 	public void moveInDirection(float direction, float speed)
 	{
@@ -61,6 +62,7 @@ public abstract class Enemy extends MovingObject {
 	public abstract float patrolSpeed();
 	public abstract float chaseSpeeed();
 	
+	//chase or patrol depending on game state
 	@Override
 	public void doTimeStep()
 	{

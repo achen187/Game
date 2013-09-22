@@ -14,13 +14,7 @@ import GameEngine.GameTexture;
 import GameEngine.GameFont;
 import GameEngine.GameObject;
 
-///to do
-//make sure that the player is behind on kill
-//make enemies continue on path evenw hen they reaach the point
-//set up random map
-//different weapons
-//different enemies
-//boost
+
 
 //==================================================================================================
 //==================================================================================================
@@ -38,14 +32,11 @@ public class SurvivalGame extends Game
     // Grid GameObjects, only used to draw floor
     private GameObject [] [] gridTile;
     
+    //tiles for the maze
     public static int numRows = 24;
     public static int numCols = 24;
     private Tile[][] mazeTile;
     
-    
-    // The cooldown of the gun (set this to 0 for a cool effect :> )
-    //private int cooldown = 10;
-    //private int cooldownTimer = 0;
     
     // Important GameObjects
     private PlayerObject player; // the player
@@ -54,6 +45,11 @@ public class SurvivalGame extends Game
     private GameTexture bulletTexture;
     public GameTexture wallTexture;
     public GameTexture verticalWallTexture;
+    public GameTexture dropTexture;
+    public GameTexture largeFlash;
+
+    public GameTexture shipTexture;
+
 
     
     //GameFonts that will be used
@@ -72,24 +68,30 @@ public class SurvivalGame extends Game
     // Variable to keep track of the background / world size
     private Point2D.Float worldSize;
     
+    //how long before the chase mode expires
     public static int secondsRemaining;
+    //where the user was last spotted
     public static int lastSeenGridX;
     public static int lastSeenGridY;
     
+    //the height and width of each tile
     public static int heightTile;
     public static int widthTile;
 
+    //how long to chase
     private int CHASE_TIME = 10;
     
     private Timer chaseTimer;
-    
+    private Timer generationTimer;
     private Timer timeLeft;
     
-    private int secondsLeft = 1000;
+    //time given to user to finish maze
+    private int secondsLeft = 180;
     private boolean gameWon = false;
     
+    private int score = 0;
+    
     private ArrayList<WallObject> walls = new ArrayList<WallObject> ();
-    //private static boolean ableToAttack = true;
     // Name your audio cues here and set the paths the files are located!!
     // Make sure the enum and paths match!
  	enum AudioFiles
@@ -131,14 +133,11 @@ public class SurvivalGame extends Game
         
     }
     
-//    public static void setAbleToAttack(boolean fire)
-//    {
-//    	ableToAttack = fire;
-//    }
+
 
     //==================================================================================================
     
-    public void initStep(ResourceLoader loader)
+    public void initStep(final ResourceLoader loader)
     {
     	// Add the Audio paths
 		for (int i = 0; i < AudioPaths.length; i++)
@@ -158,7 +157,13 @@ public class SurvivalGame extends Game
         bulletTexture = loader.loadTexture("Textures/bullet.png");
         wallTexture = loader.loadTexture("Textures/wall.png" );
         verticalWallTexture = loader.loadTexture("Textures/wallvertical.png" );
+        dropTexture = loader.loadTexture("Textures/flashlight.png" );
+        largeFlash = loader.loadTexture("Textures/largeFlashlight.png" );
 
+        shipTexture = loader.loadTexture("Textures/spaceship_sm.gif" );
+
+     
+        
      // Setup the world grid system
         GameTexture floorTexture = loader.loadTexture("Textures/floor_steel.jpg");
 
@@ -169,59 +174,37 @@ public class SurvivalGame extends Game
         heightTile = (int) (worldSize.y / numRows);
         widthTile = (int) (worldSize.x/ numCols);
         
+        //generates and displays maze
         mazeTile = new Tile[numRows][numCols];
         MazeGenerator.generateMaze(mazeTile, this);
         displayMaze(mazeTile);
         
-        // Creating some random rocks to shoot
-//        for (int i = 0 ; i <8 ; i++)
-//        {
-//        	float x = (float) (Math.random()*worldSize.x);
-//      		float y = (float) (Math.random() *worldSize.y);
-//          
-//			GenericGuard go = new GenericGuard(x, y, this, loader);
-//			
-//			float direction =((int) (Math.random()*4))*90;
-//			go.setDirection(direction);
-//			objects.add(go);
-//        }
-//        
-//        for (int i = 0 ; i <8 ; i++)
-//        {
-//        	float x = (float) (Math.random()*worldSize.x);
-//      		float y = (float) (Math.random() *worldSize.y);
-//          
-//			TallGuard go = new TallGuard(x, y, this, loader);
-//			
-//			float direction =((int) (Math.random()*4))*90;
-//			go.setDirection(direction);
-//			objects.add(go);
-//        }
-//        
-        /*// Add the special item
-        GameTexture gtSpec = loader.loadTexture("Textures/Special.png");
-        GameObject goSpec = new GameObject(300, 500);
-        goSpec.addTexture(gtSpec);
-        goSpec.setCollidable(false);
-        objects.add(goSpec);
-        GameObject goSpec2 = new GameObject(450, 500);
-        goSpec2.addTexture(gtSpec);
-        goSpec2.setCollidable(false);
-        goSpec2.reflectX(true);
-        objects.add(goSpec2);
-        GameObject goSpec3 = new GameObject(600, 500);
-        goSpec3.addTexture(gtSpec);
-        goSpec3.setCollidable(false);
-        goSpec3.reflectY(true);
-        objects.add(goSpec3);
-        GameObject goSpec4 = new GameObject(750, 500);
-        goSpec4.addTexture(gtSpec);
-        goSpec4.setCollidable(false);
-        goSpec4.reflectX(true);
-        goSpec4.reflectY(true);
-        goSpec4.setRotation(180.0f);
-        objects.add(goSpec4);
-        */
+        //loads 4 generic guards and 4 tall guards
+        for (int i = 0 ; i <4 ; i++)
+        {
+        	int gridX = (int) (Math.random()*(numCols-4)+4);
+      		int gridY = (int) (Math.random() *(numRows-4)+4);
+          
+			GenericGuard go = new GenericGuard(mazeTile[gridY][gridX].getMidX(), mazeTile[gridY][gridX].getMidY(), this);
+			
+			float direction =((int) (Math.random()*4))*90;
+			go.setDirection(direction);
+			objects.add(go);
+        }
+        
+        for (int i = 0 ; i <4 ; i++)
+        {
+        	int gridX = (int) (Math.random()*(numCols-4)+4);
+      		int gridY = (int) (Math.random() *(numRows-4)+4);
+          
+			TallGuard go = new TallGuard(mazeTile[gridY][gridX].getMidX(), mazeTile[gridY][gridX].getMidY(), this);
+			
+			float direction =((int) (Math.random()*4))*90;
+			go.setDirection(direction);
+			objects.add(go);
+        }
+        
+        
         
         // creating the floor objects
         gridTile = new GameObject[numTiles][numTiles];
@@ -235,39 +218,20 @@ public class SurvivalGame extends Game
         }
         
         
-        /*// Creating wall objects
-        for (int i = 0 ; i < floorTexture.getWidth()*gridSize ; i += rockTexture.getWidth())
-        {
-    		WallObject go = new WallObject(i, 0);
-    		go.addTexture(rockTexture, 0, 0);
-    		objects.add(go);
-    		
-    		go = new WallObject(i, floorTexture.getHeight()*(gridSize-1));
-    		go.addTexture(rockTexture, 0, 0);
-    		objects.add(go);
-        }
-        for (int i = floorTexture.getHeight() ; i < floorTexture.getHeight()*(gridSize-1) ; i += rockTexture.getHeight())
-        {
-    		WallObject go = new WallObject(0, i);
-    		go.addTexture(rockTexture, 0, 0);
-    		objects.add(go);
-    		
-    		go = new WallObject(rockTexture.getWidth()*(gridSize-1), i);
-    		go.addTexture(rockTexture, 0, 0);
-    		objects.add(go);
-        }*/
         
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         
         // Creating the player's ship
         player = new PlayerObject(
-                             mazeTile[12][12].getMidX(),
-                             mazeTile[12][12].getMidY(), this, loader);
+                             mazeTile[0][0].getMidX(),
+                             mazeTile[0][0].getMidY(), this, loader);
         
         objects.add(player);
         
-        objects.add(new EndPoint(300, 300, this, loader, "Textures/flashlight.png"));
+        //sets the finish point
+        objects.add(new EndPoint(mazeTile[23][23].getMidX(), mazeTile[23][23].getMidY(), this, loader, "Textures/flashlight.png"));
         
+        //start the game timer
         timeLeft = new Timer();
         timeLeft.scheduleAtFixedRate(new TimerTask(){
         	public void run()
@@ -281,11 +245,37 @@ public class SurvivalGame extends Game
         	}
         }
         , 1000, 1000);
+        
+        //loads new enemies every 20 seconds
+        //first shows a drop zone to warn user
+        generationTimer = new Timer();
+        generationTimer.scheduleAtFixedRate(new TimerTask(){
+        	public void run()
+        	{
+        		int gridRow = (int) (Math.random()*numRows);
+        		int gridCol = (int) (Math.random()*numCols);
+        		Tile curTile = mazeTile[gridRow][gridCol];
+        		DropZone drop = new DropZone(curTile.getMidX(), curTile.getMidY(), SurvivalGame.this );
+        		objects.add(drop);
+        		try {
+					Thread.sleep(4000);
+					objects.remove(drop);
+					GenericGuard go = new GenericGuard((float)curTile.getMidX(), (float)curTile.getMidY(), 
+							SurvivalGame.this);
+					objects.add(go);
+					
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+        	}
+        	
+        }, 10000, 20000);
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     }
 
     
-    public boolean canMoveInDirection(MovingObject obj)
+    //given obj, returns whether an obj can move in directiona ngle
+    public boolean canMoveInDirection(MovingObject obj, float angle)
     {
     	int gridX = obj.getGridX();
     	int gridY = obj.getGridY();
@@ -295,49 +285,26 @@ public class SurvivalGame extends Game
     	int midX = curTile.getMidX();
     	int midY = curTile.getMidY();
 
-    	if (obj.direction == 180 && ((curTile.hasWall(0) && objY >= midY)
+    	if (angle == 180 && ((curTile.hasWall(0) && objY >= midY)
     			|| Math.abs(objX- midX) > 10))
     		return false;
-    	if (obj.direction == 90 && ((curTile.hasWall(1)&& objX >= midX) || Math.abs(objY- midY) > 10))
+    	if (angle == 90 && ((curTile.hasWall(1)&& objX >= midX) || Math.abs(objY- midY) > 10))
     		return false; 
-    	if (obj.direction == 0 && ((curTile.hasWall(2)&& objY <= midY) || Math.abs(objX- midX) > 10))
+    	if (angle == 0 && ((curTile.hasWall(2)&& objY <= midY) || Math.abs(objX- midX) > 10))
     		return false;
-    	if (obj.direction == 270 && ((curTile.hasWall(3)&& objX <= midX) || Math.abs(objY- midY) > 10))
+    	if (angle == 270 && ((curTile.hasWall(3)&& objX <= midX) || Math.abs(objY- midY) > 10))
     		return false; 
-    	System.out.println(obj.getPosition());
-    	System.out.println(curTile + " " + curTile.getMidX() + " " + curTile.getMidY());
+    	
     	return true;
     }
+    
+   
 
-    //==================================================================================================
-    
-    // this method is used to fire a bullet 
-    /*public void fireBullet()
-    {
-//        cooldownTimer = cooldown;
-        
-        float dir = player.direction;
-        BulletObject bullet =
-                new BulletObject(
-                         player.getPosition().x + (float)Math.sin(Math.toRadians(dir))*32, player.getPosition().y - (float)Math.cos(Math.toRadians(dir))*32, 1f, 300, bulletTexture);
-        
-        //bullet.setVelocity(player.getVelocity());
-        bullet.applyForceInDirection(dir, 6f);
-        
-        objects.add(bullet);
-        
-        // Play the laser sound
-        gameAudio.PlayAudioIndex(AudioFiles.Laser.index);
-    }*/
     
     
-    
+    //displays the maze 
     private void displayMaze(Tile[][] mazeTile) {
-    	
-    	
-    	
 
-    	
 		for (int i = 0; i < numRows; i++)
 		{
 			for (int j = 0; j < numCols; j++)
@@ -445,9 +412,7 @@ public class SurvivalGame extends Game
         
         if (alive)
         {
-            handleControls(gii);
-            //player.setDirection(90+player.getDegreesTo(mousePos));
-        
+            handleControls(gii);        
         
         // NOTE: you must call doTimeStep for ALL game objects once per frame!
         // updateing step for each object
@@ -483,12 +448,12 @@ public class SurvivalGame extends Game
         	if (!o1.getCollidable())
         		continue;
         	
+        	//if the bullet collides with a wall, destroy it
         	if (o1 instanceof BulletObject)
         	{
         		if (wallCollision((BulletObject) o1))
         		{
         			o1.setMarkedForDestruction(true);
-        			System.out.println(o1.getPosition());
         			continue;
         		}
         	}
@@ -506,17 +471,6 @@ public class SurvivalGame extends Game
                 	{
                 		// Skip wall vs wall objects
                 	}
-//                	else if ((o1 instanceof BulletObject && o2 instanceof WallObject) || o1 instanceof WallObject && o2 instanceof BulletObject)
-//                	{
-//                		if (fineTuneCollision(o1,o2))
-//                		{
-//                			// Just destroy the bullet, not the wall
-//                			if (o1 instanceof BulletObject)
-//                				o1.setMarkedForDestruction(true);
-//                			else
-//                				o2.setMarkedForDestruction(true);
-//                		}
-//                	}
                 	else if (o1 instanceof PlayerObject && o2 instanceof Enemy || o1 instanceof Enemy && o2 instanceof PlayerObject)
                 	{
                 		if (fineTuneCollision(o1,o2))
@@ -533,7 +487,6 @@ public class SurvivalGame extends Game
                 		if (fineTuneCollision(o1,o2))
                 		{
                 			alert(player);
-                			
                 		}
                 	}
                 	else if (o1 instanceof Enemy && o2 instanceof Knife || o1 instanceof Knife && o2 instanceof Enemy)
@@ -544,19 +497,20 @@ public class SurvivalGame extends Game
                 			{
                 				if (o1 instanceof Enemy)
                 				{
-                					if (((Knife) o2).isBehind((Enemy)o1))
+                					if (player.isBehind((MovingObject)o1))
                 					{
                 						o1.setMarkedForDestruction(true);
                 					}
                 				}
                 				else
                 				{
-                					if (((Knife) o1).isBehind((Enemy)o2))
+                					if (player.isBehind((MovingObject)o2))
                 					{
                 						o2.setMarkedForDestruction(true);
                 					}
                 				}
                 			}
+                			score+=50;
                 		}
                 	}
                 	else if (o1 instanceof Enemy && o2 instanceof BulletObject || o1 instanceof BulletObject && o2 instanceof Enemy)
@@ -565,6 +519,7 @@ public class SurvivalGame extends Game
                 		{
                 			o1.setMarkedForDestruction(true);
                 			o2.setMarkedForDestruction(true);
+                			score+=10;
                 		}
                 	}
                 	
@@ -585,17 +540,7 @@ public class SurvivalGame extends Game
                 	
                 	else
                 	{
-                		//System.out.println("Removing objects "+i +":"+j);
-//                		if (fineTuneCollision(o1,o2))
-//                		{
-//                			o1.setMarkedForDestruction(true);
-//                			o2.setMarkedForDestruction(true);
-//
-//                			// Play the explosion sound as something blew up (EXAMPLE)
-//                			//gameAudio.PlayAudioIndex(AudioFiles.Explosion.index);
-//                		}
                 		
-                		// Note: you can also implement something like o1.reduceHealth(5); if you don't want the object to be immediatly destroyed
                 	}
                 }
             }
@@ -621,7 +566,8 @@ public class SurvivalGame extends Game
     }
 
     
-
+//returns whether the bulelt collides with a wall. used so we dont include the walls
+    //for normal collision detection. makes the game faster
     private boolean wallCollision(BulletObject bullet) {
     	for (WallObject w : walls)
     	{
@@ -634,6 +580,7 @@ public class SurvivalGame extends Game
     	return false;
     }
 
+    //starts the chase
 	public void startChase()
     {
     	if (chaseTimer != null)
@@ -655,6 +602,7 @@ public class SurvivalGame extends Game
 		}, 2000, 2000);
     }
 
+	//given collision detection
 	public static boolean fineTuneCollision(GameObject o1, GameObject o2) {
 
 		ByteBuffer bb1 = o1.getCurrentTexture().getByteBuffer();
@@ -738,14 +686,7 @@ public class SurvivalGame extends Game
         }
         
 
-        // this is just a random line drawn in the corner of the screen
-       // drawer.draw(GameDrawer.LINES, linePositions, lineColours, 0.5f);
         
-//        if (player != null)
-//        {
-//        	Point2D.Float [] playerLines = {mousePos, player.getPosition()};
-//        	drawer.draw(GameDrawer.LINES, playerLines, lineColours, 0.5f);
-//        }
         
         drawer.setColour(1.0f,1.0f,1.0f,1.0f);
         
@@ -762,21 +703,12 @@ public class SurvivalGame extends Game
     		alive = false;
         }
 
-        // this is just a random line drawn in the corner of the screen (but not offset this time ;) )
-        //drawer.draw(GameDrawer.LINES, linePositions, lineColours, 0.5f);
-        drawer.draw(arial, ""+secondsRemaining+ " "+lastSeenGridX + " " + lastSeenGridY, new Point2D.Float(20,20), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
-        drawer.draw(arial, ""+player.getGridX() + " " + player.getGridY(), new Point2D.Float(20,68), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
-        drawer.draw(arial, ""+ secondsLeft, new Point2D.Float(20,120), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
-
-
         
-        // Some debug type info to demonstrate the font drawing
-        /*if (player != null)
-        {
-        	drawer.draw(arial, ""+player.getDirection(), new Point2D.Float(20,120), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
-        }*/
-        //drawer.draw(arial, ""+mouseWheelTick, new Point2D.Float(20,68), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
-        //drawer.draw(serif, ""+mousePos.x +":"+mousePos.y, new Point2D.Float(20,20), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
+        drawer.draw(arial, ""+ secondsLeft, new Point2D.Float(worldSize.x/2,worldSize.y-100), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
+        drawer.draw(arial, "Score: "+ score, new Point2D.Float(20,worldSize.y-100), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
+
+
+       
     }
 
 	public void alert(PlayerObject player) {

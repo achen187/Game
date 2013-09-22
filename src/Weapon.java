@@ -4,7 +4,7 @@ import java.util.TimerTask;
 import GameEngine.Game.GameDrawer;
 import GameEngine.Game.ResourceLoader;
 
-
+//abstract calss representing all weapons
 public abstract class Weapon extends MyGameObject {
 
 	PlayerObject mPlayerObject;
@@ -15,9 +15,9 @@ public abstract class Weapon extends MyGameObject {
 		super (arg0, arg1, game);
 		mPlayerObject = playerObject;
 
-		// TODO Auto-generated constructor stub
 	}
 
+	//better version of cooldown, sets a timer that sets whether the player is attacking already
 	public void attack()
 	{
 		mPlayerObject.attacking(true);

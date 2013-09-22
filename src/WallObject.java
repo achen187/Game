@@ -3,6 +3,7 @@
 import GameEngine.Game.GameDrawer;
 import GameEngine.GameObject;
 
+//wallObject for the maze
 public class WallObject extends MyGameObject {
 
     public WallObject(float x, float y, SurvivalGame game, int degree){

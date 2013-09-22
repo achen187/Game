@@ -4,6 +4,7 @@ import GameEngine.Game.GameDrawer;
 import GameEngine.GameObject;
 
 
+//super class represinting a moving object
 public abstract class MovingObject extends MyGameObject {
 
 	float direction;
@@ -52,9 +53,18 @@ public abstract class MovingObject extends MyGameObject {
 	{
 		oldPosition = this.getPosition();
 		setDirection(direction);
-		if (game.canMoveInDirection(this))
+		if (game.canMoveInDirection(this, direction))
 			incrementPosition((float)Math.sin(Math.toRadians(direction))*speed, -(float)Math.cos(Math.toRadians(direction))*speed);
 		
+	}
+	
+	public boolean isBehind(MovingObject other)
+	{
+		int myDir = (int) getDirection();
+		int otherDir = (int) other.getDirection();
+		if (myDir == otherDir)
+			return true;
+		return false;
 	}
 	
 	
