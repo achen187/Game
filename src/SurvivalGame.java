@@ -289,14 +289,20 @@ public class SurvivalGame extends Game
     {
     	int gridX = obj.getGridX();
     	int gridY = obj.getGridY();
+    	float objX = obj.getPosition().x;
+    	float objY = obj.getPosition().y;
     	Tile curTile = mazeTile[gridY][gridX];
-    	if (obj.direction == 180 && curTile.hasWall(0) && obj.getPosition().y >= curTile.getMidY())
+    	int midX = curTile.getMidX();
+    	int midY = curTile.getMidY();
+
+    	if (obj.direction == 180 && ((curTile.hasWall(0) && objY >= midY)
+    			|| Math.abs(objX- midX) > 10))
     		return false;
-    	if (obj.direction == 90 && curTile.hasWall(1)&& obj.getPosition().x >= curTile.getMidX())
+    	if (obj.direction == 90 && ((curTile.hasWall(1)&& objX >= midX) || Math.abs(objY- midY) > 10))
     		return false; 
-    	if (obj.direction == 0 && curTile.hasWall(2)&& obj.getPosition().y <= curTile.getMidY())
+    	if (obj.direction == 0 && ((curTile.hasWall(2)&& objY <= midY) || Math.abs(objX- midX) > 10))
     		return false;
-    	if (obj.direction == 270 && curTile.hasWall(3)&& obj.getPosition().x <= curTile.getMidX())
+    	if (obj.direction == 270 && ((curTile.hasWall(3)&& objX <= midX) || Math.abs(objY- midY) > 10))
     		return false; 
     	System.out.println(obj.getPosition());
     	System.out.println(curTile + " " + curTile.getMidX() + " " + curTile.getMidY());

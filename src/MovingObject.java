@@ -57,6 +57,7 @@ public abstract class MovingObject extends MyGameObject {
 		
 	}
 	
+	
 	public abstract float[] getColor();
 	
 
