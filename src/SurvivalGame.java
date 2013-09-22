@@ -174,30 +174,30 @@ public class SurvivalGame extends Game
         displayMaze(mazeTile);
         
         // Creating some random rocks to shoot
-        for (int i = 0 ; i <8 ; i++)
-        {
-        	float x = (float) (Math.random()*worldSize.x);
-      		float y = (float) (Math.random() *worldSize.y);
-          
-			GenericGuard go = new GenericGuard(x, y, this, loader);
-			
-			float direction =((int) (Math.random()*4))*90;
-			go.setDirection(direction);
-			objects.add(go);
-        }
-        
-        for (int i = 0 ; i <8 ; i++)
-        {
-        	float x = (float) (Math.random()*worldSize.x);
-      		float y = (float) (Math.random() *worldSize.y);
-          
-			TallGuard go = new TallGuard(x, y, this, loader);
-			
-			float direction =((int) (Math.random()*4))*90;
-			go.setDirection(direction);
-			objects.add(go);
-        }
-        
+//        for (int i = 0 ; i <8 ; i++)
+//        {
+//        	float x = (float) (Math.random()*worldSize.x);
+//      		float y = (float) (Math.random() *worldSize.y);
+//          
+//			GenericGuard go = new GenericGuard(x, y, this, loader);
+//			
+//			float direction =((int) (Math.random()*4))*90;
+//			go.setDirection(direction);
+//			objects.add(go);
+//        }
+//        
+//        for (int i = 0 ; i <8 ; i++)
+//        {
+//        	float x = (float) (Math.random()*worldSize.x);
+//      		float y = (float) (Math.random() *worldSize.y);
+//          
+//			TallGuard go = new TallGuard(x, y, this, loader);
+//			
+//			float direction =((int) (Math.random()*4))*90;
+//			go.setDirection(direction);
+//			objects.add(go);
+//        }
+//        
         /*// Add the special item
         GameTexture gtSpec = loader.loadTexture("Textures/Special.png");
         GameObject goSpec = new GameObject(300, 500);
@@ -261,8 +261,8 @@ public class SurvivalGame extends Game
         
         // Creating the player's ship
         player = new PlayerObject(
-                             (float)(worldSize.x)/2f,
-                             (float)(worldSize.y)/2f, this, loader);
+                             mazeTile[12][12].getMidX(),
+                             mazeTile[12][12].getMidY(), this, loader);
         
         objects.add(player);
         
@@ -284,6 +284,24 @@ public class SurvivalGame extends Game
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     }
 
+    
+    public boolean canMoveInDirection(MovingObject obj)
+    {
+    	int gridX = obj.getGridX();
+    	int gridY = obj.getGridY();
+    	Tile curTile = mazeTile[gridY][gridX];
+    	if (obj.direction == 180 && curTile.hasWall(0) && obj.getPosition().y >= curTile.getMidY())
+    		return false;
+    	if (obj.direction == 90 && curTile.hasWall(1)&& obj.getPosition().x >= curTile.getMidX())
+    		return false; 
+    	if (obj.direction == 0 && curTile.hasWall(2)&& obj.getPosition().y <= curTile.getMidY())
+    		return false;
+    	if (obj.direction == 270 && curTile.hasWall(3)&& obj.getPosition().x <= curTile.getMidX())
+    		return false; 
+    	System.out.println(obj.getPosition());
+    	System.out.println(curTile + " " + curTile.getMidX() + " " + curTile.getMidY());
+    	return true;
+    }
 
     //==================================================================================================
     
@@ -740,8 +758,8 @@ public class SurvivalGame extends Game
 
         // this is just a random line drawn in the corner of the screen (but not offset this time ;) )
         //drawer.draw(GameDrawer.LINES, linePositions, lineColours, 0.5f);
-        drawer.draw(arial, ""+secondsRemaining+ " "+lastSeenGridX + " " + lastSeenGridY, new Point2D.Float(20,68), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
-        drawer.draw(arial, ""+player.getGridX() + " " + player.getGridY(), new Point2D.Float(20,20), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
+        drawer.draw(arial, ""+secondsRemaining+ " "+lastSeenGridX + " " + lastSeenGridY, new Point2D.Float(20,20), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
+        drawer.draw(arial, ""+player.getGridX() + " " + player.getGridY(), new Point2D.Float(20,68), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
         drawer.draw(arial, ""+ secondsLeft, new Point2D.Float(20,120), 1.0f, 0.5f, 0.0f, 0.7f, 0.1f);
 
 

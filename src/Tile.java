@@ -40,6 +40,16 @@ public class Tile {
 		return false;
 	}
 	
+	public int getMidX()
+	{
+		return column * SurvivalGame.widthTile + SurvivalGame.widthTile/2;
+	}
+	
+	public int getMidY()
+	{
+		return row * SurvivalGame.heightTile + SurvivalGame.heightTile/2;
+
+	}
 	
 	public void destroyWall(Tile other)
 	{
